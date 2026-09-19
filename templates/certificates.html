@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}All Certificates - Tamper-Proof Certificate System{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+        <h2 class="fw-bold mb-1">Issued Certificates Repository</h2>
+        <p class="text-muted small mb-0">Search, verify, download, and manage digital certificates</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('issue_certificate') }}" class="btn btn-primary">
+            <i class="bi bi-patch-plus me-1"></i> Issue New Certificate
+        </a>
+    </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="card shadow-sm p-3 mb-4">
+    <form method="GET" action="{{ url_for('certificates') }}" class="row g-2 align-items-center">
+        <div class="col-md-7">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" class="form-control border-start-0 ps-0" name="q" value="{{ search_query }}" placeholder="Search by Candidate Name, Certificate ID, Course, or Token...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" name="status">
+                <option value="">All Statuses</option>
+                <option value="VALID" {{ 'selected' if status_filter == 'VALID' }}>VALID</option>
+                <option value="REVOKED" {{ 'selected' if status_filter == 'REVOKED' }}>REVOKED</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+            {% if search_query or status_filter %}
+            <a href="{{ url_for('certificates') }}" class="btn btn-outline-secondary" title="Reset Filters">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Certificates Table -->
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 filterable-table">
+            <thead class="table-light">
+                <tr>
+                    <th>Certificate ID</th>
+                    <th>Candidate</th>
+                    <th>Course & Institution</th>
+                    <th>Issue Date</th>
+                    <th>Identity Token</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if certificates %}
+                    {% for cert in certificates %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('certificate_details', cert_id=cert.id) }}" class="fw-bold text-decoration-none">
+                                {{ cert.certificate_id }}
+                            </a>
+                        </td>
+                        <td class="fw-semibold">{{ cert.candidate_name }}</td>
+                        <td>
+                            <div class="fw-semibold text-dark">{{ cert.course_name }}</div>
+                            <div class="small text-muted">{{ cert.institution_name }}</div>
+                        </td>
+                        <td class="small">{{ cert.issue_date }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-1">
+                                <code class="small text-truncate" style="max-width: 130px;" title="{{ cert.token }}">{{ cert.token[:8] }}...{{ cert.token[-4:] }}</code>
+                                <button type="button" class="btn btn-sm btn-light border p-1" id="copy-btn-{{ cert.id }}" onclick="copyToClipboard('{{ cert.token }}', 'copy-btn-{{ cert.id }}')" title="Copy Token">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            {% if cert.status == 'VALID' %}
+                                <span class="badge bg-success">VALID</span>
+                            {% elif cert.status == 'REVOKED' %}
+                                <span class="badge bg-danger">REVOKED</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ cert.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('certificate_details', cert_id=cert.id) }}" class="btn btn-outline-secondary" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ url_for('download_certificate', cert_id=cert.id) }}" class="btn btn-outline-primary" title="Download Certificate PDF">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                                <a href="{{ url_for('verify_token', token=cert.token) }}" class="btn btn-outline-success" title="Verify Certificate">
+                                    <i class="bi bi-shield-check"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                            No certificates matched your search criteria.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

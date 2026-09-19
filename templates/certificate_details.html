@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Certificate {{ cert.certificate_id }} - Tamper-Proof Certificate System{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{{ url_for('certificates') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to All Certificates
+    </a>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Certificate Details & Hash Comparison -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
+                <div>
+                    <span class="badge bg-light text-primary border mb-1">{{ cert.certificate_type }}</span>
+                    <h3 class="fw-bold mb-0 text-dark">{{ cert.candidate_name }}</h3>
+                    <div class="text-muted small">Certificate ID: <strong class="text-dark">{{ cert.certificate_id }}</strong></div>
+                </div>
+                <div>
+                    {% if cert.status == 'VALID' %}
+                        <span class="badge bg-success fs-6 px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i> VALID</span>
+                    {% elif cert.status == 'REVOKED' %}
+                        <span class="badge bg-danger fs-6 px-3 py-2"><i class="bi bi-x-circle-fill me-1"></i> REVOKED</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark fs-6 px-3 py-2">{{ cert.status }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6">
+                    <label class="text-muted small fw-semibold">Course / Program</label>
+                    <div class="fw-bold text-dark fs-6">{{ cert.course_name }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <label class="text-muted small fw-semibold">Issuing Institution</label>
+                    <div class="fw-bold text-dark fs-6">{{ cert.institution_name }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <label class="text-muted small fw-semibold">Date of Issue</label>
+                    <div class="text-dark">{{ cert.issue_date }}</div>
+                </div>
+                <div class="col-sm-6">
+                    <label class="text-muted small fw-semibold">Database Record Created</label>
+                    <div class="text-dark">{{ cert.created_at }}</div>
+                </div>
+            </div>
+
+            <!-- Cryptographic Identity Token -->
+            <div class="mb-4">
+                <label class="text-muted small fw-semibold d-block mb-1">
+                    <i class="bi bi-key-fill text-warning me-1"></i> Unique Identity Token (UUIDv4)
+                </label>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="token-code flex-grow-1" id="token-val">{{ cert.token }}</span>
+                    <button class="btn btn-outline-secondary btn-sm" id="copy-token-btn" onclick="copyToClipboard('{{ cert.token }}', 'copy-token-btn')">
+                        <i class="bi bi-clipboard me-1"></i> Copy
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cryptographic SHA-256 Integrity Verification Box -->
+            <div class="card bg-light border p-3">
+                <h6 class="fw-bold text-dark mb-2 d-flex align-items-center justify-content-between">
+                    <span><i class="bi bi-cpu text-primary me-1"></i> Cryptographic SHA-256 Integrity Status</span>
+                    {% if current_hash and current_hash == cert.sha256_hash %}
+                        <span class="badge bg-success small"><i class="bi bi-shield-check"></i> INTEGRITY INTACT</span>
+                    {% elif current_hash and current_hash != cert.sha256_hash %}
+                        <span class="badge bg-danger small"><i class="bi bi-exclamation-triangle"></i> TAMPERED / HASH MISMATCH</span>
+                    {% else %}
+                        <span class="badge bg-secondary small">FILE NOT FOUND</span>
+                    {% endif %}
+                </h6>
+
+                <div class="mb-2">
+                    <div class="small fw-semibold text-muted mb-1">Original Stored SHA-256 Digest (Database):</div>
+                    <div class="hash-box matched">{{ cert.sha256_hash }}</div>
+                </div>
+
+                {% if current_hash %}
+                <div>
+                    <div class="small fw-semibold text-muted mb-1">Current Calculated SHA-256 Digest (On Disk File):</div>
+                    <div class="hash-box {{ 'matched' if current_hash == cert.sha256_hash else 'mismatch' }}">
+                        {{ current_hash }}
+                    </div>
+                </div>
+                {% if current_hash != cert.sha256_hash %}
+                <div class="alert alert-danger p-2 mt-2 mb-0 small">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    <strong>Warning:</strong> The current file hash does not match the database hash. This document has been tampered with!
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: QR Code & Actions -->
+    <div class="col-lg-4">
+        <!-- QR Code Card -->
+        <div class="card shadow-sm p-4 text-center mb-4">
+            <h5 class="fw-bold mb-1">Verification QR Code</h5>
+            <p class="text-muted small mb-3">Scan to verify authenticity instantly</p>
+
+            <div class="mb-3">
+                {% if cert.qr_code_path %}
+                <img src="/{{ cert.qr_code_path }}" alt="Verification QR Code" class="qr-preview-img img-fluid shadow-sm">
+                {% else %}
+                <div class="p-4 bg-light text-muted">No QR Code Available</div>
+                {% endif %}
+            </div>
+
+            <div class="small text-muted mb-2">Target Verification URL:</div>
+            <code class="small d-block mb-3 text-truncate bg-light p-2 rounded">/verify/{{ cert.token }}</code>
+
+            <a href="{{ url_for('verify_token', token=cert.token, qr='true') }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-box-arrow-up-right me-1"></i> Open Verification Link
+            </a>
+        </div>
+
+        <!-- Management Actions Card -->
+        <div class="card shadow-sm p-4">
+            <h5 class="fw-bold mb-3">Administrative Actions</h5>
+
+            <div class="d-grid gap-2">
+                <!-- Download -->
+                <a href="{{ url_for('download_certificate', cert_id=cert.id) }}" class="btn btn-primary">
+                    <i class="bi bi-download me-1"></i> Download Certificate PDF
+                </a>
+
+                <!-- Verify -->
+                <a href="{{ url_for('verify_token', token=cert.token) }}" class="btn btn-outline-success">
+                    <i class="bi bi-shield-check me-1"></i> Verify Status Now
+                </a>
+
+                <!-- Revoke Button & Form -->
+                {% if cert.status == 'VALID' %}
+                <form method="POST" action="{{ url_for('revoke_certificate', cert_id=cert.id) }}" onsubmit="return confirm('Are you sure you want to REVOKE this certificate? This action will invalidate the credential.');">
+                    <button type="submit" class="btn btn-outline-danger w-100">
+                        <i class="bi bi-ban me-1"></i> Revoke Certificate
+                    </button>
+                </form>
+                {% endif %}
+
+                <!-- Reissue Button & Form -->
+                <form method="POST" action="{{ url_for('reissue_cert', cert_id=cert.id) }}" onsubmit="return confirm('Reissuing will generate a brand new Unique Token, QR Code, and SHA-256 Hash. Proceed?');">
+                    <button type="submit" class="btn btn-outline-warning text-dark w-100">
+                        <i class="bi bi-arrow-repeat me-1"></i> Reissue / Regenerate Token
+                    </button>
+                </form>
+
+                <!-- College Project Presentation: Tamper Demo Button -->
+                <div class="border-top pt-3 mt-2">
+                    <div class="text-danger fw-bold small mb-1">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Presentation Demo Tool:
+                    </div>
+                    <p class="text-muted small mb-2">
+                        Simulate file tampering on disk to demonstrate SHA-256 mismatch detection during college viva.
+                    </p>
+                    <form method="POST" action="{{ url_for('tamper_demo', cert_id=cert.id) }}" onsubmit="return confirm('This will inject altered bytes into the physical PDF certificate file without updating the database hash. Continue demo?');">
+                        <button type="submit" class="btn btn-danger btn-sm w-100 fw-semibold">
+                            <i class="bi bi-bug me-1"></i> Simulate Tampering (Inject Data)
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

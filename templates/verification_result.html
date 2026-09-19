@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Verification Result - Tamper-Proof Certificate System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-lg-9">
+        <!-- Result Box Container -->
+        <div class="card verification-box {{ status|lower }} p-4 mb-4">
+            <!-- Header Status Badge -->
+            <div class="text-center mb-4">
+                {% if status == 'VALID' %}
+                    <div class="verification-badge badge-valid mb-3">
+                        <i class="bi bi-check-circle-fill fs-3"></i>
+                        <span>✓ CERTIFICATE VERIFIED</span>
+                    </div>
+                    <h3 class="fw-bold text-success mb-1">Authentic & Valid Credential</h3>
+                    <p class="text-muted">{{ reason }}</p>
+                {% elif status == 'TAMPERED' %}
+                    <div class="verification-badge badge-tampered mb-3">
+                        <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+                        <span>✗ CERTIFICATE TAMPERED / INVALID</span>
+                    </div>
+                    <h3 class="fw-bold text-danger mb-1">Cryptographic Integrity Violation</h3>
+                    <p class="text-danger fw-semibold">{{ reason }}</p>
+                {% elif status == 'REVOKED' %}
+                    <div class="verification-badge badge-revoked mb-3">
+                        <i class="bi bi-slash-circle-fill fs-3"></i>
+                        <span>! CERTIFICATE REVOKED</span>
+                    </div>
+                    <h3 class="fw-bold text-warning text-dark mb-1">Credential Invalidated</h3>
+                    <p class="text-muted">{{ reason }}</p>
+                {% else %}
+                    <div class="verification-badge badge-invalid mb-3">
+                        <i class="bi bi-x-circle-fill fs-3"></i>
+                        <span>✗ CERTIFICATE NOT FOUND</span>
+                    </div>
+                    <h3 class="fw-bold text-danger mb-1">Unrecognized Credential</h3>
+                    <p class="text-muted">{{ reason }}</p>
+                {% endif %}
+            </div>
+
+            <!-- College Presentation Demonstration Table (Status Breakdown) -->
+            <div class="card bg-light border-0 p-3 mb-4">
+                <h6 class="fw-bold text-dark text-uppercase small mb-3">
+                    <i class="bi bi-shield-check text-primary me-1"></i> Verification Analysis Breakdown
+                </h6>
+                <div class="row g-3 text-center">
+                    <div class="col-md-4">
+                        <div class="p-3 bg-white rounded border shadow-sm h-100">
+                            <div class="small text-muted fw-semibold">Token Status</div>
+                            <div class="fs-5 fw-bold mt-1">
+                                {% if token_status == 'VALID' %}
+                                    <span class="text-success"><i class="bi bi-check2-circle"></i> VALID</span>
+                                {% elif token_status == 'FOUND' %}
+                                    <span class="text-primary"><i class="bi bi-check2"></i> FOUND</span>
+                                {% elif token_status == 'REVOKED' %}
+                                    <span class="text-warning text-dark"><i class="bi bi-slash-circle"></i> REVOKED</span>
+                                {% else %}
+                                    <span class="text-danger"><i class="bi bi-x-circle"></i> NOT FOUND</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-3 bg-white rounded border shadow-sm h-100">
+                            <div class="small text-muted fw-semibold">SHA-256 Hash Status</div>
+                            <div class="fs-5 fw-bold mt-1">
+                                {% if hash_status == 'MATCHED' %}
+                                    <span class="text-success"><i class="bi bi-check-circle-fill"></i> MATCHED</span>
+                                {% elif hash_status == 'MISMATCH' %}
+                                    <span class="text-danger"><i class="bi bi-x-octagon-fill"></i> MISMATCH</span>
+                                {% else %}
+                                    <span class="text-secondary"><i class="bi bi-question-circle"></i> {{ hash_status }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-3 bg-white rounded border shadow-sm h-100">
+                            <div class="small text-muted fw-semibold">Certificate Status</div>
+                            <div class="fs-5 fw-bold mt-1">
+                                {% if status == 'VALID' %}
+                                    <span class="badge bg-success fs-6">VALID</span>
+                                {% elif status == 'TAMPERED' %}
+                                    <span class="badge bg-danger fs-6">TAMPERED</span>
+                                {% elif status == 'REVOKED' %}
+                                    <span class="badge bg-warning text-dark fs-6">REVOKED</span>
+                                {% else %}
+                                    <span class="badge bg-dark fs-6">INVALID</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if cert %}
+            <!-- Certificate Information Table -->
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th colspan="2" class="py-2">
+                                <i class="bi bi-patch-check text-primary me-2"></i> Credential Specifications
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-semibold text-muted" style="width: 30%;">Candidate Name</td>
+                            <td class="fw-bold fs-5 text-dark">{{ cert.candidate_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Course / Program</td>
+                            <td class="fw-semibold text-primary">{{ cert.course_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Certificate ID</td>
+                            <td class="fw-bold font-monospace">{{ cert.certificate_id }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Issuing Institution</td>
+                            <td>{{ cert.institution_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Date of Issue</td>
+                            <td>{{ cert.issue_date }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Unique Identity Token</td>
+                            <td><code class="text-dark bg-light px-2 py-1 rounded">{{ cert.token }}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-muted">Verification Timestamp</td>
+                            <td class="small text-muted">{{ now.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cryptographic Fingerprint Comparison Box -->
+            <div class="card bg-light border p-3 mb-4">
+                <h6 class="fw-bold text-dark mb-2">
+                    <i class="bi bi-cpu text-primary me-1"></i> Cryptographic Hash Comparison (SHA-256)
+                </h6>
+                <div class="mb-2">
+                    <div class="small fw-semibold text-muted mb-1">Stored Hash (Recorded at Issuance):</div>
+                    <div class="hash-box matched">{{ stored_hash }}</div>
+                </div>
+                <div>
+                    <div class="small fw-semibold text-muted mb-1">Calculated Current Hash (From File):</div>
+                    <div class="hash-box {{ 'matched' if hash_status == 'MATCHED' else 'mismatch' }}">{{ calculated_hash }}</div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Actions Bar -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2 border-top">
+                <a href="{{ url_for('verify') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Verify Another Certificate
+                </a>
+                <div class="d-flex gap-2">
+                    {% if cert and status == 'VALID' and cert.file_path %}
+                    <a href="{{ url_for('download_certificate', cert_id=cert.id) }}" class="btn btn-primary">
+                        <i class="bi bi-download me-1"></i> Download Verified Certificate
+                    </a>
+                    {% endif %}
+                    {% if not current_user %}
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-dark">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Admin Portal
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Verification History - Tamper-Proof Certificate System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+        <h2 class="fw-bold mb-1">Verification Audit Log</h2>
+        <p class="text-muted small mb-0">Complete historical audit trail of all certificate verification attempts</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('verify') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-shield-check me-1"></i> Public Verification Portal
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 filterable-table">
+            <thead class="table-light">
+                <tr>
+                    <th>Log ID</th>
+                    <th>Certificate</th>
+                    <th>Candidate</th>
+                    <th>Token Entered</th>
+                    <th>Method</th>
+                    <th>Result</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if history %}
+                    {% for h in history %}
+                    <tr>
+                        <td class="text-muted small">#{{ h.id }}</td>
+                        <td>
+                            {% if h.certificate_id %}
+                                <a href="{{ url_for('certificate_details', cert_id=h.certificate_id) }}" class="fw-bold text-decoration-none">
+                                    {{ h.cert_code or 'ID: ' ~ h.certificate_id }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">Unlinked</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ h.candidate_name or 'N/A' }}</td>
+                        <td>
+                            <code class="small text-truncate d-inline-block" style="max-width: 140px;" title="{{ h.token_entered }}">
+                                {{ h.token_entered }}
+                            </code>
+                        </td>
+                        <td>
+                            {% if h.verification_method == 'QR' %}
+                                <span class="badge bg-info text-dark"><i class="bi bi-qr-code"></i> QR Scan</span>
+                            {% elif h.verification_method == 'FILE_UPLOAD' %}
+                                <span class="badge bg-secondary"><i class="bi bi-file-earmark-arrow-up"></i> File Upload</span>
+                            {% else %}
+                                <span class="badge bg-light text-dark border"><i class="bi bi-key"></i> Token</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if h.verification_result == 'VALID' %}
+                                <span class="badge bg-success">VALID</span>
+                            {% elif h.verification_result == 'TAMPERED' %}
+                                <span class="badge bg-danger">TAMPERED</span>
+                            {% elif h.verification_result == 'REVOKED' %}
+                                <span class="badge bg-warning text-dark">REVOKED</span>
+                            {% else %}
+                                <span class="badge bg-dark">INVALID</span>
+                            {% endif %}
+                        </td>
+                        <td class="small text-muted">{{ h.verified_at }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-clock-history fs-1 d-block mb-2 text-secondary"></i>
+                            No verification attempts recorded yet.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

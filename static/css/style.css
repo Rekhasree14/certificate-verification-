@@ -1,0 +1,231 @@
+/* Custom Styling for Tamper-Proof Digital Certificate Verification System */
+
+:root {
+    --primary: #0f2744;
+    --primary-light: #1e3a5f;
+    --accent: #c59b27;
+    --accent-hover: #b08a20;
+    --success: #198754;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --info: #0dcaf0;
+    --dark: #1e293b;
+    --light-bg: #f8fafc;
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
+}
+
+body {
+    background-color: var(--light-bg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #334155;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar */
+.navbar-custom {
+    background-color: var(--primary);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-custom .navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+}
+
+.navbar-custom .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
+}
+
+.navbar-custom .nav-link:hover,
+.navbar-custom .nav-link.active {
+    color: #ffd700;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+    background-color: #0d1f33;
+    color: #94a3b8;
+    padding: 20px 0;
+    font-size: 0.9rem;
+}
+
+/* Cards */
+.card {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    background-color: var(--card-bg);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card {
+    border-left: 5px solid var(--primary);
+}
+
+.stat-card.stat-valid {
+    border-left-color: var(--success);
+}
+
+.stat-card.stat-revoked {
+    border-left-color: var(--danger);
+}
+
+.stat-card.stat-verifications {
+    border-left-color: var(--accent);
+}
+
+.stat-number {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+/* Verification Result Box */
+.verification-box {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.verification-box.valid {
+    border-top: 8px solid var(--success);
+}
+
+.verification-box.tampered,
+.verification-box.invalid {
+    border-top: 8px solid var(--danger);
+}
+
+.verification-box.revoked {
+    border-top: 8px solid var(--warning);
+}
+
+.verification-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.badge-valid {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 2px solid #a3cfbb;
+}
+
+.badge-tampered,
+.badge-invalid {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 2px solid #f5c2c7;
+}
+
+.badge-revoked {
+    background-color: #fff3cd;
+    color: #664d03;
+    border: 2px solid #ffecb5;
+}
+
+/* Monospace Code Boxes */
+.token-code {
+    background: #f1f5f9;
+    color: #0f172a;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.95rem;
+    border: 1px solid #cbd5e1;
+    word-break: break-all;
+    display: inline-block;
+}
+
+.hash-box {
+    background: #1e293b;
+    color: #38bdf8;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    word-break: break-all;
+}
+
+.hash-box.mismatch {
+    background: #450a0a;
+    color: #fca5a5;
+    border: 1px solid #ef4444;
+}
+
+.hash-box.matched {
+    background: #052e16;
+    color: #86efac;
+    border: 1px solid #22c55e;
+}
+
+/* QR Code Preview */
+.qr-preview-img {
+    max-width: 170px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 6px;
+    background: white;
+}
+
+/* Tables */
+.table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-light);
+}
+
+.btn-gold {
+    background-color: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    font-weight: 600;
+}
+
+.btn-gold:hover {
+    background-color: var(--accent-hover);
+    color: #ffffff;
+    border-color: var(--accent-hover);
+}
+
+/* Certificate Preview in Detail page */
+.certificate-preview-card {
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}

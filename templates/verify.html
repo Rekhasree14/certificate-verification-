@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Digital Certificate - Authentic Credential Verification{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-3">
+    <div class="col-lg-8">
+        <div class="text-center mb-4">
+            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3 shadow-sm" style="width: 68px; height: 68px;">
+                <i class="bi bi-shield-check fs-2 text-warning"></i>
+            </div>
+            <h2 class="fw-bold text-dark">Verify Digital Certificate</h2>
+            <p class="text-muted">Authenticate institutional credentials using unique identity tokens or document hash verification</p>
+        </div>
+
+        <div class="card shadow-sm p-4 mb-4">
+            <!-- Nav tabs for Verification Method -->
+            <ul class="nav nav-pills nav-fill mb-4" id="verifyTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active fw-semibold" id="token-tab" data-bs-toggle="pill" data-bs-target="#tab-token" type="button" role="tab">
+                        <i class="bi bi-key-fill me-1"></i> Verify by Identity Token
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-semibold" id="file-tab" data-bs-toggle="pill" data-bs-target="#tab-file" type="button" role="tab">
+                        <i class="bi bi-file-earmark-pdf-fill me-1"></i> Verify by Certificate File
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="verifyTabContent">
+                <!-- Tab 1: Verify by Token -->
+                <div class="tab-pane fade show active" id="tab-token" role="tabpanel">
+                    <form method="POST" action="{{ url_for('verify') }}">
+                        <div class="mb-4">
+                            <label for="token" class="form-label fw-semibold">Enter Unique Identity Token</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light"><i class="bi bi-qr-code"></i></span>
+                                <input type="text" class="form-control font-monospace" id="token" name="token" placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000" required autofocus>
+                            </div>
+                            <div class="form-text">
+                                The unique token is printed at the bottom of the digital certificate and embedded within its QR code.
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-semibold">
+                            <i class="bi bi-shield-check me-1"></i> Verify Certificate Authenticity
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tab 2: Verify by File Upload -->
+                <div class="tab-pane fade" id="tab-file" role="tabpanel">
+                    <form method="POST" action="{{ url_for('verify') }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="verify_file" class="form-label fw-semibold">Upload Certificate PDF / Document</label>
+                            <input class="form-control form-control-lg" type="file" id="verify_file" name="verify_file" accept=".pdf,.png,.jpg,.jpeg" required>
+                            <div class="form-text">
+                                The system will calculate the SHA-256 cryptographic digest of the uploaded file and compare it with the immutable database record.
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="token_optional" class="form-label fw-semibold">Associated Token (Optional)</label>
+                            <input type="text" class="form-control font-monospace" id="token_optional" name="token" placeholder="Optional token to correlate with uploaded file">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-semibold">
+                            <i class="bi bi-cpu me-1"></i> Calculate SHA-256 & Verify Integrity
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explanatory / College Project Architecture Card -->
+        <div class="card bg-light border p-3">
+            <h6 class="fw-bold text-dark mb-2">
+                <i class="bi bi-info-circle text-primary me-1"></i> How Cryptographic Verification Works:
+            </h6>
+            <div class="row g-2 small text-muted">
+                <div class="col-md-4">
+                    <strong>1. Identity Token:</strong> Every certificate receives a globally unique UUIDv4 token during issuance.
+                </div>
+                <div class="col-md-4">
+                    <strong>2. SHA-256 Hashing:</strong> The document content produces a 256-bit cryptographic signature stored in the database.
+                </div>
+                <div class="col-md-4">
+                    <strong>3. Tamper Detection:</strong> If even 1 single byte of the certificate is altered, the SHA-256 digest changes completely, flagging the document as TAMPERED.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

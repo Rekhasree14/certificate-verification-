@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Issue Certificate - Tamper-Proof Certificate System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-sm p-4">
+            <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                <div class="bg-primary text-white rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
+                    <i class="bi bi-patch-plus fs-3 text-warning"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold mb-0">Issue New Digital Certificate</h3>
+                    <p class="text-muted small mb-0">Enter certificate details to generate a unique cryptographic token, QR code, and SHA-256 fingerprint</p>
+                </div>
+            </div>
+
+            <!-- Cryptographic Process Info Banner -->
+            <div class="alert alert-info py-2 px-3 mb-4 small">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-cpu-fill me-2 fs-5"></i>
+                    <div>
+                        <strong>Cryptographic Security Pipeline:</strong>
+                        System will generate a unique UUIDv4 token, render a dynamic QR code pointing to <code>/verify/&lt;token&gt;</code>, calculate an immutable SHA-256 checksum, and produce a tamper-evident digital certificate.
+                    </div>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('issue_certificate') }}" enctype="multipart/form-data">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="certificate_id" class="form-label fw-semibold">Certificate ID <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-hash"></i></span>
+                            <input type="text" class="form-control" id="certificate_id" name="certificate_id" placeholder="e.g. CERT-2026-001" required>
+                        </div>
+                        <div class="form-text">Must be a unique identifier for this credential.</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="candidate_name" class="form-label fw-semibold">Candidate Full Name <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                            <input type="text" class="form-control" id="candidate_name" name="candidate_name" placeholder="e.g. Priya Sharma" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="course_name" class="form-label fw-semibold">Course / Program Name <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-book"></i></span>
+                            <input type="text" class="form-control" id="course_name" name="course_name" placeholder="e.g. Python Programming & Data Structures" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="institution_name" class="form-label fw-semibold">Issuing Institution <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-building"></i></span>
+                            <input type="text" class="form-control" id="institution_name" name="institution_name" value="National Institute of Technology" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="issue_date" class="form-label fw-semibold">Date of Issue <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-calendar-event"></i></span>
+                            <input type="date" class="form-control" id="issue_date" name="issue_date" value="{{ today_date }}" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="certificate_type" class="form-label fw-semibold">Certificate Type</label>
+                        <select class="form-select" id="certificate_type" name="certificate_type">
+                            <option value="Course Completion" selected>Course Completion</option>
+                            <option value="Diploma">Diploma</option>
+                            <option value="Professional Certificate">Professional Certificate</option>
+                            <option value="Degree">Degree</option>
+                            <option value="Workshop Certificate">Workshop Certificate</option>
+                            <option value="Achievement Award">Achievement Award</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Certificate File Option -->
+                <div class="card bg-light border p-3 mb-4">
+                    <h6 class="fw-bold mb-2">
+                        <i class="bi bi-file-earmark-pdf text-danger me-1"></i> Certificate File Generation / Upload
+                    </h6>
+                    <p class="text-muted small mb-3">
+                        You can either upload an existing certificate file, or <strong>leave it empty</strong> to automatically generate an ornate, high-resolution official PDF certificate using ReportLab.
+                    </p>
+                    <div>
+                        <label for="certificate_file" class="form-label small fw-semibold">Upload Certificate File (Optional: PDF, PNG, JPG)</label>
+                        <input class="form-control" type="file" id="certificate_file" name="certificate_file" accept=".pdf,.png,.jpg,.jpeg">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('certificates') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                        <i class="bi bi-check-circle me-1"></i> Issue & Cryptographically Sign
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
