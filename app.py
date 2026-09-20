@@ -142,9 +142,7 @@ def logout():
 
 @app.route('/')
 def index():
-    if 'user_id' in session:
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('verify'))
+    return render_template('index.html')
 
 @app.route('/dashboard')
 @login_required

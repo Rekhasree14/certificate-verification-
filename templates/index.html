@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Tamper-Proof Digital Certificate Verification System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row align-items-center py-5 my-2">
+    <div class="col-lg-7 text-center text-lg-start mb-5 mb-lg-0">
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill bg-white border shadow-sm">
+            <span class="badge bg-success rounded-pill">Active</span>
+            <span class="small fw-semibold text-secondary">Cryptographic SHA-256 Verification</span>
+        </div>
+        <h1 class="display-4 fw-bold text-dark mb-3 lh-sm">
+            Tamper-Proof Digital Certificate Verification System
+        </h1>
+        <p class="lead text-muted mb-4">
+            A secure credential management and instant verification platform for universities, colleges, and training institutes. Powered by unique identity tokens, dynamic QR codes, and SHA-256 cryptographic integrity checking.
+        </p>
+
+        <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3">
+            <a href="{{ url_for('verify') }}" class="btn btn-primary btn-lg px-4 fw-semibold shadow-sm">
+                <i class="bi bi-shield-check me-2"></i> Verify Certificate
+            </a>
+            {% if current_user %}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-dark btn-lg px-4 fw-semibold">
+                <i class="bi bi-speedometer2 me-2"></i> Go to Dashboard
+            </a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn btn-outline-dark btn-lg px-4 fw-semibold">
+                <i class="bi bi-box-arrow-in-right me-2"></i> Admin Portal
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Verification Card on Hero -->
+    <div class="col-lg-5">
+        <div class="card shadow border-0 p-4 bg-white" style="border-radius: 16px;">
+            <div class="d-flex align-items-center mb-3">
+                <div class="bg-primary text-white rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                    <i class="bi bi-qr-code-scan fs-5 text-warning"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Instant Verification</h5>
+                    <small class="text-muted">Enter a token or test a sample</small>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('verify') }}" class="mb-3">
+                <div class="mb-3">
+                    <label for="token" class="form-label small fw-semibold">Unique Identity Token (UUID)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                        <input type="text" class="form-control font-monospace" id="token" name="token" placeholder="Paste identity token..." required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                    <i class="bi bi-search me-1"></i> Verify Authenticity
+                </button>
+            </form>
+
+            <!-- Quick Demo Tokens -->
+            <div class="border-top pt-3 mt-1">
+                <div class="small fw-semibold text-muted mb-2">
+                    <i class="bi bi-lightning-charge text-warning me-1"></i> Try Sample Pre-Seeded Tokens:
+                </div>
+                <div class="d-flex flex-column gap-2">
+                    <a href="{{ url_for('verify_token', token='a3ced718-c6be-4408-9945-c1b3cae78e56') }}" class="btn btn-sm btn-light border text-start d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="d-block text-dark">CERT-1001: Rahul Kumar</strong>
+                            <code class="small text-muted">a3ced718-c6be-4408-9945-c1b3cae78e56</code>
+                        </div>
+                        <span class="badge bg-success">VALID</span>
+                    </a>
+                    <a href="{{ url_for('verify_token', token='c6e30dfb-8a7f-42b3-9515-0be218724ede') }}" class="btn btn-sm btn-light border text-start d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="d-block text-dark">CERT-1002: Ananya Sharma</strong>
+                            <code class="small text-muted">c6e30dfb-8a7f-42b3-9515-0be218724ede</code>
+                        </div>
+                        <span class="badge bg-success">VALID</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="my-5 py-4 border-top">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark">How the Tamper-Proof System Works</h2>
+        <p class="text-muted">A mathematically verifiable pipeline guaranteeing authentic credentials</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border text-center shadow-sm">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-patch-plus fs-3 text-warning"></i>
+                </div>
+                <h5 class="fw-bold mb-2">1. Issuance & Token Generation</h5>
+                <p class="text-muted small mb-0">
+                    Administrator issues a certificate. The system assigns a unique UUIDv4 identity token, generates an embedded QR code, and produces an official PDF credential.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border text-center shadow-sm">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-cpu fs-3 text-warning"></i>
+                </div>
+                <h5 class="fw-bold mb-2">2. SHA-256 Hash Calculation</h5>
+                <p class="text-muted small mb-0">
+                    A 256-bit cryptographic digest of the certificate document is calculated and immutably stored in the SQLite database as an authoritative integrity fingerprint.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border text-center shadow-sm">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-shield-check fs-3 text-warning"></i>
+                </div>
+                <h5 class="fw-bold mb-2">3. Instant Tamper Detection</h5>
+                <p class="text-muted small mb-0">
+                    When scanned or verified, the system recalculates the document's hash in real time. If even one single character was altered, the system flags it as <strong>TAMPERED</strong>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Login Quick Banner -->
+<div class="card bg-primary text-white p-4 my-4 shadow-sm" style="border-radius: 16px;">
+    <div class="row align-items-center">
+        <div class="col-md-8 text-center text-md-start mb-3 mb-md-0">
+            <h4 class="fw-bold mb-1">Are you an Institution Administrator?</h4>
+            <p class="text-light opacity-75 mb-0">
+                Log in with demo credentials: Username: <code>admin</code> | Password: <code>admin123</code>
+            </p>
+        </div>
+        <div class="col-md-4 text-center text-md-end">
+            <a href="{{ url_for('login') }}" class="btn btn-warning px-4 py-2 fw-bold text-dark">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Admin Login
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
